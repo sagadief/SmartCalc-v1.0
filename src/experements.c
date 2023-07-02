@@ -1,17 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
+
+//old
 #define MAX_SIZE 100
 
-typedef struct {
-    char data[MAX_SIZE];
-    int top;
-} Stack;
+// typedef struct {
+//     char data[MAX_SIZE];
+//     int top;
+// } Stack;
+
+
+///////////////
+typedef struct t_stack {
+    char value;
+    struct t_stack* next;
+} t_stack;
+///////////////
+
+
+
+
+
 
 // Проверка, является ли стек пустым
-int isEmpty(Stack* stack) {
-    return stack->top == -1;
+bool isEmpty(t_stack *head) {
+    return head == NULL;
 }
 
 
@@ -93,38 +109,75 @@ int getPriority(char symbol) {
     return res;
 }
 // Размещение элемента в стеке
-void push(Stack* stack, char symbol) {
-    if (stack->top < MAX_SIZE - 1) {
-        stack->data[++stack->top] = symbol;
-    } else {
-        printf("Ошибка: стек переполнен\n");
-        exit(1);
+
+// void push(t_stack** head, t_stack* elem) {
+void push(t_stack** head, t_stack* elem) {
+    if (head && elem) {
+        elem->next = *head;
+        *head = elem;
     }
 }
 
 // Удаление элемента из стека и возврат его значения
-char pop(Stack* stack) {
-    if (!isEmpty(stack)) {
-        return stack->data[stack->top--];
-    } else {
-        printf("Ошибка: попытка извлечения из пустого стека\n");
-        exit(1);
+// char pop(Stack* stack) {
+//     if (!isEmpty(stack)) {
+//         return stack->data[stack->top--];
+//     } else {
+//         printf("Ошибка: попытка извлечения из пустого стека\n");
+//         exit(1);
+//     }
+// }
+
+t_stack* pop(t_stack** head) {
+    t_stack* temp = NULL;
+    if (!isEmpty(*head)) {
+        temp = *head;
+        *head = (*head)->next;   
     }
+    return temp; 
 }
+
+t_stack* create_stack_elem(char value) {
+    t_stack* new_elem = malloc(sizeof(t_stack));
+    if (new_elem) {
+        new_elem->value = value;
+        new_elem->next = NULL;
+    }
+
+    return new_elem;
+    // возвращает NULL если память не выделилась
+}
+
+
+
 
 // Структура стека
 
 
 // Инициализация стека
-void init(Stack* stack) {
-    stack->top = -1;
-}
+// void init(t_stack** head) {
+//     stack->top = -1;
+// }
 
 
 
 
 
 //============================================================================
+
+// t_stack* create_stack_elem(char value) {
+//     t_stack* new_elem;
+//     new_elem  = malloc(sizeof(t_stack));
+//     if (new_elem) {
+//         new_elem->value = value;
+//         new_elem->next = NULL;
+//     }
+
+//     return new_elem;
+//     // возвращает NULL если память не выделилась
+// }
+
+
 
 // char print_one_elem_from_stack(t_stack** head) {
 //     t_stack* current = *head;
@@ -159,47 +212,53 @@ void init(Stack* stack) {
 
 // Преобразование инфиксной нотации в обратную польскую нотацию
 void infixToPostfix(char* infix, char* postfix) {
-    Stack stack;
-    init(&stack);
+    t_stack* head = NULL;
 
     int i = 0, j = 0;
     char symbol, topSymbol;
 
-
     for (i; infix[i] != '\0'; i++) {
         symbol = infix[i];
-
+        int cont = 1;
         if (symbol == ' ' || symbol == '\t') {
-            continue;
+            cont = 0;                                        //continue;
         }
-        if (isOperator(&symbol, infix, &i)) {
-            while (!isEmpty(&stack)) {
-                topSymbol = stack.data[stack.top];
-                if (getPriority(topSymbol) >= getPriority(symbol)) {
-                    postfix[j++] = pop(&stack);
-                    // delete_elem_from_stack(&stack);
-                } else {
-                    break;
+        if (cont) {
+            if (isOperator(&symbol, infix, &i)) {
+                int stop = 1;
+                while (!isEmpty(head) && stop) {
+                    topSymbol = head->value;
+                    if (getPriority(topSymbol) >= getPriority(symbol)) {
+                        t_stack* tmp = pop(&head);
+                        postfix[j++] = tmp->value;
+                        free(tmp);
+                    } else {
+                        stop = 0;          //break
+                    }
                 }
-            }
-            push(&stack, symbol);
-        } else if (symbol == '(') {
-            push(&stack, symbol);
-        } else if (symbol == ')') {
-            while (!isEmpty(&stack)) {
-                topSymbol = pop(&stack);
-                if (topSymbol == '(') {
-                    break;
+                push(&head, create_stack_elem(symbol));
+            } else if (symbol == '(') {
+                push(&head, create_stack_elem(symbol));
+            } else if (symbol == ')') {
+                int stop = 1;
+                while (!isEmpty(head) && stop) {
+                    t_stack* tmp = pop(&head);
+                    topSymbol = tmp->value;
+                    free(tmp);
+                    if (topSymbol == '(') {
+                        stop = 0;
+                    }
+                    if (stop) {postfix[j++] = topSymbol;}
                 }
-                postfix[j++] = topSymbol;
+            } else {
+                postfix[j++] = symbol;
             }
-        } else {
-            postfix[j++] = symbol;
         }
     }
-
-    while (!isEmpty(&stack)) {
-        postfix[j++] = pop(&stack);
+    while (!isEmpty(head)) {
+        t_stack* tmp = pop(&head);
+        postfix[j++] = tmp->value;
+        free(tmp);
     }
 
     postfix[j++] = '\0';
@@ -207,12 +266,34 @@ void infixToPostfix(char* infix, char* postfix) {
 
 // Функция для тестирования
 int main() {
-    char infix[MAX_SIZE];
-    char postfix[MAX_SIZE];
 
-    printf("Введите выражение в инфиксной нотации: ");
-    fgets(infix, sizeof(infix), stdin);
-    infix[strlen(infix) - 1] = '\0';
+
+//////////
+    char *infix = NULL; 
+    char *postfix = NULL; 
+    int len = 0;
+    int bufsize = 0;
+    char c;
+    printf("Введите строку: ");
+    while ((c = getchar()) != '\n') {
+            if (len >= bufsize - 1) {
+                bufsize += 32;
+                infix = realloc(infix, bufsize);
+                if (!infix) {
+                    printf("Ошибка: не удалось выделить память\n");
+                    exit(1);
+                }
+            }
+            infix[len++] = c;
+        }
+
+    infix[len] = '\0';
+//////////
+
+    char postfix[MAX_SIZE];
+    // char *postfix = NULL;
+
+
 
     infixToPostfix(infix, postfix);
 
