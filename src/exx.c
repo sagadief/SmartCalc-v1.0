@@ -4,14 +4,14 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <math.h>
+#include "header.h"
+// typedef struct t_stack {
+//     char* value;
+//     struct t_stack* next;
+// } t_stack;
 
-typedef struct t_stack {
-    char* value;
-    struct t_stack* next;
-} t_stack;
 
-
-bool isEmpty(t_stack *head) {
+bool is_empty(t_stack *head) {
     return head == NULL;
 }
 
@@ -24,7 +24,7 @@ void print_all_stack(t_stack* head) {
     t_stack* current = head;
     while (current != NULL) {
         // Вывод значения текущего элемента стека
-        printf("%s |", current->value);
+        printf("%s | ", current->value);
         // Переход к следующему элементу стека
         current = current->next;
     }
@@ -63,7 +63,7 @@ t_stack* create_stack_elem(char* value) {
 
 
 
-int isOperator(char *symbol, char *str, int *i) {
+int is_operator(char *symbol, char *str, int *i) {
     bool result = false;
 
     if (strncmp(str + *i, "cos", 3) == 0) {
@@ -183,7 +183,7 @@ void push_back(t_stack **head, t_stack *elem)
 
 t_stack* pop(t_stack** head) {
     t_stack* temp = NULL;
-    if (!isEmpty(*head)) {
+    if (!is_empty(*head)) {
         temp = *head;
         *head = (*head)->next;
     }
@@ -209,6 +209,9 @@ t_stack* pop(t_stack** head) {
 // tmp->next = NULL;
 // free(popped);
 
+bool is_unary_operator(const char* operator) {
+    return strcmp(operator, "-") == 0 || strcmp(operator, "+") == 0;
+}
 
 
 char* get_last_elem(t_stack* head) {
@@ -269,8 +272,8 @@ int get_number(char * infix, int pos, t_stack **head) {
             push_back(head, tmp);
         } else {
             pos = -1;
-            free(number);
         }
+        free(number);
     }
     return pos;
 }
@@ -282,7 +285,8 @@ void double_to_str(double x, t_stack **head) {
     int length = snprintf(NULL, 0, "%0.15f", x);
     char* result = malloc((length + 1) * sizeof(char)); // Выделение памяти для строки результатов
     snprintf(result, length + 1, "%0.15f", x);
-    push_front(head, create_stack_elem(result));
+    // push_front(head, create_stack_elem(result));
+    push_back(head, create_stack_elem(result));
     free(result);
 }
 
@@ -290,16 +294,32 @@ void double_to_str(double x, t_stack **head) {
 
 
 
-// strncat(number, &infix[pos - number_size + 1], 1);
+// void check_bracket();
+
 
 // Преобразование инфиксной нотации в обратную польскую нотацию
 void infixToPostfix(char* infix, t_stack** numbers) {
-    t_stack* operators = NULL;   //head -> operators
+    t_stack* operators = NULL;
     char* symbol = malloc(2 * sizeof(char));
     char* top_symbol = malloc(2 * sizeof(char));
+    int i = 0;
 
-    
-    for (int i = 0; infix[i]; i++) {
+
+    if (infix[i] == '-') {
+        symbol[0] = '-';
+        symbol[1] = '\0';
+
+        t_stack* tmp = create_stack_elem(symbol);
+        if (tmp != NULL) {
+            push_back(&operators, tmp);
+            // print_all_stack(operators);
+            i++;
+        } else {
+            printf("BAD\n");
+        }
+    }
+
+    for (i; infix[i]; i++) {
 
         symbol[0] = infix[i];
         symbol[1] = '\0';
@@ -308,10 +328,13 @@ void infixToPostfix(char* infix, t_stack** numbers) {
             should_continue = false;
         
         if (should_continue) {
-            if (isOperator(symbol, infix, &i)) {
+            if (is_operator(symbol, infix, &i)) {
                 bool should_stop = true;
-                while (!isEmpty(operators) && should_stop) {
+                while (!is_empty(operators) && should_stop) {
                     top_symbol = operators->value;
+                    // print_all_stack(operators);
+                    // printf("===%s\n", top_symbol);
+                    // printf("===%s\n", symbol);
                     if (getPriority(top_symbol) >= getPriority(symbol)) {
                         t_stack* tmp = pop(&operators);
                         // push_back(str, create_stack_elem(tmp->value));
@@ -323,10 +346,35 @@ void infixToPostfix(char* infix, t_stack** numbers) {
                 }
                 push_front(&operators, create_stack_elem(symbol));
             } else if (symbol[0] == '(') {
+
                 push_front(&operators, create_stack_elem(symbol));
+                int j = i;
+                int count = -1;
+                while (infix[j] != ')') {
+                    count++;
+                    j++;
+                }
+                char* sub_str = malloc(count * sizeof(char));
+                sub_str[count] = '\0';
+                strncpy(sub_str, infix + i + 1, count);
+                t_stack* in_brackets = NULL;
+                infixToPostfix(sub_str, &in_brackets);
+                double num = evaluatePostfix(&in_brackets);
+                printf("===========================%f\n", num);
+                i = i + count;
+                double_to_str(num, numbers);
+                print_all_stack(*numbers);
+                // printf("Выражение в обратной польской нотации: \n");
+                // while (!is_empty(*numbers)) {
+                //     t_stack* tmp = pop(numbers);
+                //     printf("%s", tmp->value);
+                //     free(tmp);
+                // }
+                // printf("\n");
+                
             } else if (symbol[0] == ')') {
                 bool should_stop = true;
-                while (!isEmpty(operators) && should_stop) {
+                while (!is_empty(operators) && should_stop) {
                     t_stack* tmp = pop(&operators);
                     top_symbol = tmp->value;
                     free(tmp);
@@ -341,7 +389,7 @@ void infixToPostfix(char* infix, t_stack** numbers) {
             }
         }
     }
-    while (!isEmpty(operators)) {
+    while (!is_empty(operators)) {
         t_stack* tmp = pop(&operators);
         push_back(numbers, create_stack_elem(tmp->value));
         free(tmp);
@@ -352,26 +400,21 @@ void infixToPostfix(char* infix, t_stack** numbers) {
 
 
 
-t_stack* evaluatePostfix(t_stack** postfix) {
+double evaluatePostfix(t_stack** postfix) {
     t_stack* head = NULL;
-    // print_all_stack(*postfix);
-    while (!isEmpty(*postfix)) {
+    while (!is_empty(*postfix)) {
+        printf("============\n");
+        print_all_stack(head);
             char* str = get_top_elem(*postfix);  // Получаем строку из стека
             double num = strtod(str, NULL);  // Преобразуем строку в число
         if (num != 0.0) {
             t_stack* tmp = pop(postfix);
-            push_front(&head, create_stack_elem(tmp->value));
-            // printf("===========%s\n", tmp->value);
-            free(tmp);
+            // push_front(&head, create_stack_elem(tmp->value)); //push_front(&head, tmp);
+            push_back(&head, create_stack_elem(tmp->value));
+            free(tmp);                                         //убираем
         } else if (check_trigon(str)) {
-            printf("--------------------\n");
-            print_all_stack(*postfix);
-            print_all_stack(head);
-            printf("--------------------\n");
             t_stack* inter = pop(&head);
             t_stack* tmp = pop(postfix);
-            // print_all_stack(*postfix);
-            // print_all_stack(head);
             char* d = tmp->value;
             free(tmp);
             double x = atof(inter->value);
@@ -418,17 +461,50 @@ t_stack* evaluatePostfix(t_stack** postfix) {
             double a = 0;
             double b = 0;
             double x = 0;
-            // print_all_stack(head);
-            t_stack* inter2 = pop(&head);
-            t_stack* inter1 = pop(&head);
-            // print_all_stack(head);
+            t_stack* inter2 = pop_back(&head);
+            t_stack* inter1 = pop_back(&head);
             t_stack* tmp = pop(postfix);
             char* d = tmp->value;
-            free(tmp);
             b = atof(inter2->value);
-            a = atof(inter1->value);
-            printf("%f\n", b);
-            printf("%f\n", a);
+            if (inter1 == NULL) {
+                if (tmp->value[0] == '-' ) {
+                    a = -1;
+                } else if (tmp->value[0] == '+') {
+                    a = 1;
+                }
+                d[0] = '*';
+            } else {
+                a = atof(inter1->value);
+            }
+
+            // if (inter2->value[0] == '-' && *d == '-')
+            //     *d = '+';
+            // if (!is_empty(head) && is_unary_operator(get_top_elem(head))) {
+            //     t_stack* unary_op = pop(&head);
+            //     char* unary_operator = unary_op->value;
+            //     free(unary_op);
+            //     if (strcmp(unary_operator, "-") == 0) {
+            //         b = -b;
+            //     } else if (strcmp(unary_operator, "+") == 0) {
+            //         // Нет никаких изменений, операнд остается без изменений
+            //     } else {
+            //         // Обработка других унарных операторов, если необходимо
+            //     }
+            // }
+
+            // if (inter1 == NULL) {
+            //     t_stack* unary_operator = create_stack_elem(tmp->value);
+            //     push_front(&head, unary_operator);
+            // } else {
+            //     a = atof(inter1->value);
+            // }
+
+
+
+
+
+            // printf("%f\n", b);
+            // printf("%f\n", a);
             // printf("%s\n", d);
             switch (*d) {
                 case '+':
@@ -447,13 +523,25 @@ t_stack* evaluatePostfix(t_stack** postfix) {
                     x = a / b;
                     double_to_str(x, &head);
                     break;
+                case '%':
+                    x = fmod(a, b);
+                    double_to_str(x, &head);
+                    break;
                 default:
                     printf("Error: Invalid operator\n");
                     exit(1);
             }
         }
     }
-    return pop(&head);
+        // return pop(&head);
+    // t_stack* tmp = pop(&head);
+    // double val = atof(tmp->value);
+    // printf("%.10f\n", val);
+    // free(tmp);
+    t_stack* tmp = pop(&head);
+    double val = atof(tmp->value);
+    free(tmp);
+    return val;
 }
 
 
@@ -466,10 +554,11 @@ t_stack* evaluatePostfix(t_stack** postfix) {
 
 
 
-
+// 5 10 - -
 
 // Функция для тестирования
 int main() {
+    // char *infix = {"5+)\0"};
     char *infix = NULL;
     t_stack* postfix = NULL;
     int len = 0;
@@ -492,12 +581,10 @@ int main() {
 
 
     infixToPostfix(infix, &postfix);
-    t_stack* tmp = evaluatePostfix(&postfix);
-    double val = atof(tmp->value);
-    printf("%lf\n", val);
-    free(tmp);
+    print_all_stack(postfix);
+    printf("%0.10f\n", evaluatePostfix(&postfix));
     // printf("Выражение в обратной польской нотации: \n");
-    // while (!isEmpty(postfix)) {
+    // while (!is_empty(postfix)) {
     //     t_stack* tmp = pop(&postfix);
     //     printf("%s", tmp->value);
     //     free(tmp);
@@ -548,7 +635,7 @@ int main() {
 //     infixToPostfix(infix, &postfix);
 //     printf("Выражение  = %с", evaluatePostfix(&postfix));    
 //     printf("Выражение в обратной польской нотации: ");
-//     while (!isEmpty(postfix)) {
+//     while (!is_empty(postfix)) {
 //         t_stack* tmp = pop(&postfix);
 //         printf("%c", tmp->value);
 //         free(tmp);
