@@ -1,0 +1,4 @@
+/Users/thracebe/Desktop/projects/C7_SmartCalc_v1.0-1/src/front/build-thracebe_calc-Desktop_x86_darwin_generic_mach_o_64bit-Debug/CMakeFiles/thracebe_calc.dir
+/Users/thracebe/Desktop/projects/C7_SmartCalc_v1.0-1/src/front/build-thracebe_calc-Desktop_x86_darwin_generic_mach_o_64bit-Debug/CMakeFiles/edit_cache.dir
+/Users/thracebe/Desktop/projects/C7_SmartCalc_v1.0-1/src/front/build-thracebe_calc-Desktop_x86_darwin_generic_mach_o_64bit-Debug/CMakeFiles/rebuild_cache.dir
+/Users/thracebe/Desktop/projects/C7_SmartCalc_v1.0-1/src/front/build-thracebe_calc-Desktop_x86_darwin_generic_mach_o_64bit-Debug/CMakeFiles/thracebe_calc_autogen.dir
