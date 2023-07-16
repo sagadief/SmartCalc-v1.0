@@ -28,6 +28,7 @@ private slots:
     void on_pushButton_AC_clicked();
     void on_pushButton_equals_clicked();
     void math_operations();
+    void brackets();
 };
 
 #endif // MAINWINDOW_H

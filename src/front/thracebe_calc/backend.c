@@ -1,15 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include <math.h>
 #include "head.h"
-// typedef struct t_stack {
-//     char* value;
-//     struct t_stack* next;
-// } t_stack;
-
 
 bool is_empty(t_stack *head) {
     return head == NULL;
@@ -20,12 +9,9 @@ bool is_empty(t_stack *head) {
 
 void print_all_stack(t_stack* head) {
     printf("Stack: ");
-    // Проход по всем элементам стека
     t_stack* current = head;
     while (current != NULL) {
-        // Вывод значения текущего элемента стека
         printf("%s | ", current->value);
-        // Переход к следующему элементу стека
         current = current->next;
     }
     printf("\n");
@@ -42,13 +28,11 @@ t_stack* create_stack_elem(char* value) {
             strcpy(new_elem->value, value);
             new_elem->next = NULL;
         } else {
-            // Обработка ошибки выделения памяти
             fprintf(stderr, "Ошибка выделения памяти\n");
             free(new_elem);
             new_elem = NULL;
         }
     } else {
-        // Обработка ошибки выделения памяти
         fprintf(stderr, "Ошибка выделения памяти\n");
     }
     return new_elem;
@@ -318,7 +302,7 @@ void infixToPostfix(char* infix, t_stack** numbers) {
         }
     }
 
-    for (i; infix[i]; i++) {
+    for (; infix[i]; i++) {
 
         symbol[0] = infix[i];
         symbol[1] = '\0';
@@ -345,7 +329,6 @@ void infixToPostfix(char* infix, t_stack** numbers) {
                     }
                 }
                 push_front(&operators, create_stack_elem(symbol));
-                // good =
             } else if (symbol[0] == '(') {
                 push_front(&operators, create_stack_elem(symbol));
                 int j = i;
@@ -360,7 +343,6 @@ void infixToPostfix(char* infix, t_stack** numbers) {
                 t_stack* in_brackets = NULL;
                 infixToPostfix(sub_str, &in_brackets);
                 double num = evaluatePostfix(&in_brackets);
-                // printf("===========================%f\n", num);
                 i = i + count;
                 double_to_str(num, numbers);
                 // print_all_stack(*numbers);
@@ -403,13 +385,12 @@ void infixToPostfix(char* infix, t_stack** numbers) {
 double evaluatePostfix(t_stack** postfix) {
     t_stack* head = NULL;
     while (!is_empty(*postfix)) {
-        // printf("============\n");
-        // print_all_stack(head);
             char* str = get_top_elem(*postfix);  // Получаем строку из стека
-            double num = strtod(str, NULL);  // Преобразуем строку в число
-        if (num != 0.0) {
+            char* endPtr;
+            strtod(str, &endPtr);
+
+            if (!(endPtr == str)) {
             t_stack* tmp = pop(postfix);
-            // push_front(&head, create_stack_elem(tmp->value)); //push_front(&head, tmp);
             push_back(&head, create_stack_elem(tmp->value));
             free(tmp);                                         //убираем
         } else if (check_trigon(str)) {
@@ -533,11 +514,6 @@ double evaluatePostfix(t_stack** postfix) {
             }
         }
     }
-        // return pop(&head);
-    // t_stack* tmp = pop(&head);
-    // double val = atof(tmp->value);
-    // printf("%.10f\n", val);
-    // free(tmp);
     t_stack* tmp = pop(&head);
     double val = atof(tmp->value);
     free(tmp);
@@ -557,42 +533,42 @@ double evaluatePostfix(t_stack** postfix) {
 // 5 10 - -
 
 // Функция для тестирования
-// int main() {
-//    // char *infix = {"5+)\0"};
-//    char *infix = NULL;
-//    t_stack* postfix = NULL;
-//    int len = 0;
-//    int bufsize = 0;
-//    char c;
-//    printf("Введите строку: ");
-//    while ((c = getchar()) != '\n') {
-//            if (len >= bufsize - 1) {
-//                bufsize += 32;
-//                infix = (char*)realloc(infix, bufsize);
-//                if (!infix) {
-//                    printf("Ошибка: не удалось выделить память\n");
-//                    exit(1);
-//                }
-//            }
-//            infix[len++] = c;
-//        }
+//int main() {
+//   // char *infix = {"5+)\0"};
+//   char *infix = NULL;
+//   t_stack* postfix = NULL;
+//   int len = 0;
+//   int bufsize = 0;
+//   char c;
+//   printf("Введите строку: ");
+//   while ((c = getchar()) != '\n') {
+//           if (len >= bufsize - 1) {
+//               bufsize += 32;
+//               infix = (char*)realloc(infix, bufsize);
+//               if (!infix) {
+//                   printf("Ошибка: не удалось выделить память\n");
+//                   exit(1);
+//               }
+//           }
+//           infix[len++] = c;
+//       }
 
-//    infix[len] = '\0';
+//   infix[len] = '\0';
 
 
-//    infixToPostfix(infix, &postfix);
-//    print_all_stack(postfix);
-//    printf("%0.10f\n", evaluatePostfix(&postfix));
-//    // printf("Выражение в обратной польской нотации: \n");
-//    // while (!is_empty(postfix)) {
-//    //     t_stack* tmp = pop(&postfix);
-//    //     printf("%s", tmp->value);
-//    //     free(tmp);
-//    // }
-//    // printf("\n");
+//   infixToPostfix(infix, &postfix);
+//   print_all_stack(postfix);
+////    printf("%0.10f\n", evaluatePostfix(&postfix));
+////    printf("Выражение в обратной польской нотации: \n");
+////    while (!is_empty(postfix)) {
+////        t_stack* tmp = pop(&postfix);
+////        printf("%s", tmp->value);
+////        free(tmp);
+////    }
+////    printf("\n");
 
-//    free(infix);
-//    free(postfix);
+//   free(infix);
+//   free(postfix);
 
-//    return 0;
-// }
+//   return 0;
+//}

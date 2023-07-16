@@ -1,0 +1,4 @@
+/Users/thracebe/Desktop/SmartCalc-v1.0/src/front/thracebe_calc/CMakeFiles/thracebe_calc.dir
+/Users/thracebe/Desktop/SmartCalc-v1.0/src/front/thracebe_calc/CMakeFiles/edit_cache.dir
+/Users/thracebe/Desktop/SmartCalc-v1.0/src/front/thracebe_calc/CMakeFiles/rebuild_cache.dir
+/Users/thracebe/Desktop/SmartCalc-v1.0/src/front/thracebe_calc/CMakeFiles/thracebe_calc_autogen.dir
