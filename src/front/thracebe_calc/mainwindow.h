@@ -22,6 +22,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+private:
+    bool y_equal_clicked;
+    double y_value;
 
 private slots:
     void digit_numbers();
@@ -31,6 +34,9 @@ private slots:
     void on_pushButton_equals_clicked();
     void math_operations();
     void brackets();
+    void on_y_equal_clicked();
 };
+
+
 
 #endif // MAINWINDOW_H

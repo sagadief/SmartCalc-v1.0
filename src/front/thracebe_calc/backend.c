@@ -207,11 +207,16 @@ t_stack* pop_back(t_stack** head) {
 }
 
 
-int get_number(char * infix, int pos, t_stack **head) {
+int get_number(char * infix, int pos, t_stack **head, double y) {
     size_t number_size = 0;
-    while (isdigit(infix[pos]) || infix[pos] == '.') {
+    bool flag = false;
+    if (infix[pos] == 'y')
+        flag = true;
+        double yy = y;
+    while (isdigit(infix[pos]) || infix[pos] == '.' || flag) {
         pos++;
         number_size++;
+        flag = false;
     }
     pos--;
     char* number = (char*)malloc((number_size + 1) * sizeof(char));
@@ -244,10 +249,31 @@ void double_to_str(double x, t_stack **head) {
 
 
 
+bool valide_str(char*infix) {
+    bool flag = true, one_digit = false;
+    int i = 0, brack = 0;
+
+    while(infix[i] != '\0') {
+        if (infix[i] == '(')
+            brack++;
+        if (infix[i] == ')')
+            brack--;
+        if (infix[i] && infix[i+1] == '.')
+            flag = false;
+        if (isdigit(infix[i]) || infix[i] == 'y')
+            one_digit = true;
+    }
+    if (brack)
+        flag = false;
+    if (one_digit)
+        flag = false;
+
+    return flag;
+}
 
 
 // Преобразование инфиксной нотации в обратную польскую
-void infixToPostfix(char* infix, t_stack** numbers) {
+void infixToPostfix(char* infix, double y, t_stack** numbers) {
     t_stack* operators = NULL;
     char* symbol = (char*)malloc(2 * sizeof(char));
     char* top_symbol =(char*) malloc(2 * sizeof(char));
@@ -258,12 +284,8 @@ void infixToPostfix(char* infix, t_stack** numbers) {
         symbol[1] = '\0';
 
         t_stack* tmp = create_stack_elem(symbol);
-        if (tmp != NULL) {
-            push_back(&operators, tmp);
-            i++;
-        } else {
-            printf("BAD\n");
-        }
+        push_back(&operators, tmp);
+        i++;
     }
 
     for (; infix[i]; i++) {
@@ -306,8 +328,8 @@ void infixToPostfix(char* infix, t_stack** numbers) {
                 strncpy(sub_str, infix + i + 1, count);
                 t_stack* in_brackets = NULL;
                 // print_all_stack(operators);
-                infixToPostfix(sub_str, &in_brackets);
-                double num = evaluatePostfix(&in_brackets);
+                infixToPostfix(sub_str, y, &in_brackets);
+                double num = evaluatePostfix(&in_brackets, y);
                 i = i + count;
                 double_to_str(num, numbers);
 
@@ -323,8 +345,8 @@ void infixToPostfix(char* infix, t_stack** numbers) {
                     if (should_stop)
                         push_back(numbers, create_stack_elem(top_symbol));
                 }
-            } else {
-                i = get_number(infix, i, numbers);
+            } else {        
+                i = get_number(infix, i, numbers, y);
             }
         }
     }
@@ -339,13 +361,18 @@ void infixToPostfix(char* infix, t_stack** numbers) {
 
 
 
-double evaluatePostfix(t_stack** postfix) {
+double evaluatePostfix(t_stack** postfix, double y) {
     t_stack* head = NULL;
     while (!is_empty(*postfix)) {
             char* str = get_top_elem(*postfix);  // Получаем строку из стека
             char* endPtr;
+            if (strcmp(str, "y") == 0) {
+                t_stack* tmp = pop(postfix);
+                push_back(&head, create_stack_elem(tmp->value));
+                free(tmp);
+            }
             strtod(str, &endPtr);
-
+            // printf("$$$$$$$$$$$$%s\n", str);
             if (!(endPtr == str)) {
             t_stack* tmp = pop(postfix);
             push_back(&head, create_stack_elem(tmp->value));
@@ -400,9 +427,14 @@ double evaluatePostfix(t_stack** postfix) {
             double x = 0;
             t_stack* inter2 = pop_back(&head);
             t_stack* inter1 = pop_back(&head);
+            if (strcmp(inter2->value, "y") == 0)
+                b = y;
+            else
+                b = atof(inter2->value);
+            // printf("inter2 = %s\n", inter2->value);
+            // printf("inter1 = %s\n", inter1->value);
             t_stack* tmp = pop(postfix);
             char* d = tmp->value;
-            b = atof(inter2->value);
             if (inter1 == NULL) {
                 if (tmp->value[0] == '-' ) {
                     a = -1;
@@ -411,7 +443,10 @@ double evaluatePostfix(t_stack** postfix) {
                 }
                 d[0] = '*';
             } else {
-                a = atof(inter1->value);
+                if (strcmp(inter1->value, "y") == 0)
+                    a = y;
+                else
+                    a = atof(inter1->value);
             }
 
             switch (*d) {
@@ -463,6 +498,7 @@ double evaluatePostfix(t_stack** postfix) {
 // Функция для тестирования
 // int main() {
 //   // char *infix = {"5+)\0"};
+//   double y = 21.00;
 //   char *infix = NULL;
 //   t_stack* postfix = NULL;
 //   int len = 0;
@@ -484,9 +520,9 @@ double evaluatePostfix(t_stack** postfix) {
 //   infix[len] = '\0';
 
 
-//   infixToPostfix(infix, &postfix);
-// //   print_all_stack(postfix);
-//   printf("%0.10f\n", evaluatePostfix(&postfix));
+//   infixToPostfix(infix, y,&postfix);
+//   print_all_stack(postfix);
+//   printf("%0.10f\n", evaluatePostfix(&postfix, y));
 // //    printf("Выражение в обратной польской нотации: \n");
 // //    while (!is_empty(postfix)) {
 // //        t_stack* tmp = pop(&postfix);

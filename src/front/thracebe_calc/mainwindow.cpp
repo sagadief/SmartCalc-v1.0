@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->pushButton_bracket_left, SIGNAL(clicked()), this, SLOT(brackets()));
     connect(ui->pushButton_bracket_right, SIGNAL(clicked()), this, SLOT(brackets()));
+
+    y_equal_clicked = false;
 }
 
 MainWindow::~MainWindow()
@@ -134,20 +136,21 @@ void MainWindow::on_pushButton_AC_clicked()
 void MainWindow::on_pushButton_equals_clicked()
 {
     t_stack* postfix = NULL;
+    double y = 0;
     QString infix = ui->resultat->text();
     QByteArray infixBytes = infix.toLatin1();
     char* infixChar = infixBytes.data();
-    printf("%s\n", infixChar);
-    infixToPostfix(infixChar, &postfix);
-    QString myString = QString::number(evaluatePostfix(&postfix));
+    if (!valide_str(infixChar)) {
+        ui->resultat->setText("ERROR");
+    }
+    if (y_equal_clicked) {
+         y = y_value;
+    }
+//    printf("%s\n", infixChar);
+    infixToPostfix(infixChar, y, &postfix);
+    QString myString = QString::number(evaluatePostfix(&postfix, y));
     ui->resultat->setText(myString);
 }
-
-
-
-
-
-
 
 
 
@@ -164,23 +167,19 @@ void MainWindow::on_pushButton_equals_clicked()
 //}
 
 
+void MainWindow::on_y_equal_clicked()
+{
+//    QPushButton *button = (QPushButton *)sender();
+//    QString currentText = ui->resultat->text();
 
+//    ui->resultat->setText(currentText + 'y');
+            QPushButton *button = (QPushButton *)sender();
+            QString currentText = ui->peremen_y->text();
 
+            y_value = currentText.toDouble(); // Преобразование строки в double
 
+            ui->resultat->setText(currentText + 'y');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            y_equal_clicked = true; // Установка флага в true после первого нажатия
+}
 
