@@ -16,6 +16,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_pushButton_del_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -24,7 +27,6 @@ private slots:
     void digit_numbers();
 
     void on_pushButton_dot_clicked();
-    void operations();
     void on_pushButton_AC_clicked();
     void on_pushButton_equals_clicked();
     void math_operations();

@@ -12,7 +12,7 @@
 #include <ctype.h>
 #include <math.h>
 
-# define SIZE 260
+// # define SIZE 260
 
 typedef struct t_stack{
     char* value;
@@ -36,6 +36,7 @@ char* get_last_elem(t_stack* head);
 t_stack* pop_back(t_stack** head);
 int get_number(char * infix, int pos, t_stack **head);
 void double_to_str(double x, t_stack **head);
+void double_to_str_trig(double x, t_stack **head);
 void infixToPostfix(char* infix, t_stack** numbers);
 double evaluatePostfix(t_stack** postfix);
 

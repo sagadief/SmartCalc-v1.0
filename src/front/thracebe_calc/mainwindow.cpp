@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_8, SIGNAL(clicked()), this, SLOT(digit_numbers()));
     connect(ui->pushButton_9, SIGNAL(clicked()), this, SLOT(digit_numbers()));
 
-    connect(ui->pushButton_percent, SIGNAL(clicked()), this, SLOT(operations()));
+
 
     connect(ui->pushButton_plus, SIGNAL(clicked()), this, SLOT(math_operations()));
     connect(ui->pushButton_minus, SIGNAL(clicked()), this, SLOT(math_operations()));
@@ -54,20 +54,6 @@ void MainWindow::on_pushButton_dot_clicked()
         ui->resultat->setText(ui->resultat->text() + '.');
 }
 
-
-void MainWindow::operations()
-{
-    QPushButton *button =  (QPushButton *) sender();
-    double all_numbers;
-    QString new_label;
-    if (button-> text() == '%') {
-        all_numbers = (ui->resultat->text() + button->text()).toDouble();
-        all_numbers = all_numbers * 0.01;
-        new_label = QString::number(all_numbers, 'g', 15);
-
-        ui->resultat->setText(new_label);
-    }
-}
 
 void MainWindow::math_operations()
 {
@@ -110,16 +96,29 @@ void MainWindow::brackets()
 
     QString currentText = ui->resultat->text();
 
-    int openBracketCount = currentText.count('(');
-    int closeBracketCount = currentText.count(')');
+//    int openBracketCount = currentText.count('(');
+//    int closeBracketCount = currentText.count(')');
 
-    if (openBracketCount > closeBracketCount) {
-        ui->resultat->setText(currentText + ')');
-    } else {
+//    if (openBracketCount > closeBracketCount) {
+//        ui->resultat->setText(currentText + ')');
+//    } else {
+//        ui->resultat->setText(currentText + '(');
+//    }
+    if (button-> text() == '(') {
         ui->resultat->setText(currentText + '(');
+    }
+    if (button-> text() == ')') {
+        ui->resultat->setText(currentText + ')');
     }
 }
 
+
+void MainWindow::on_pushButton_del_clicked()
+{
+      QString current_text = ui->resultat->text();
+      current_text.chop(1);
+      ui->resultat->setText(current_text);
+}
 
 
 
@@ -128,7 +127,7 @@ void MainWindow::brackets()
 
 void MainWindow::on_pushButton_AC_clicked()
 {
-
+    ui->resultat->clear();
 }
 
 
@@ -138,6 +137,7 @@ void MainWindow::on_pushButton_equals_clicked()
     QString infix = ui->resultat->text();
     QByteArray infixBytes = infix.toLatin1();
     char* infixChar = infixBytes.data();
+    printf("%s\n", infixChar);
     infixToPostfix(infixChar, &postfix);
     QString myString = QString::number(evaluatePostfix(&postfix));
     ui->resultat->setText(myString);
@@ -162,6 +162,7 @@ void MainWindow::on_pushButton_equals_clicked()
 //{
 //    ui->textEdit->setText("Hello everybody");
 //}
+
 
 
 
