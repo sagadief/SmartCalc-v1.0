@@ -35,6 +35,8 @@ private slots:
     void math_operations();
     void brackets();
     void on_y_equal_clicked();
+
+    void trigon();
 };
 
 

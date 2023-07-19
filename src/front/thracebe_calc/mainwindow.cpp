@@ -22,6 +22,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_9, SIGNAL(clicked()), this, SLOT(digit_numbers()));
 
 
+    connect(ui->pushButton_sin, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_cos, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_tan, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_ln, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_mod, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_asin, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_acos, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_atan, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_log, SIGNAL(clicked()), this, SLOT(trigon()));
+    connect(ui->pushButton_sqrt, SIGNAL(clicked()), this, SLOT(trigon()));
+
+
 
     connect(ui->pushButton_plus, SIGNAL(clicked()), this, SLOT(math_operations()));
     connect(ui->pushButton_minus, SIGNAL(clicked()), this, SLOT(math_operations()));
@@ -52,7 +64,7 @@ void MainWindow::digit_numbers()
 
 void MainWindow::on_pushButton_dot_clicked()
 {
-    if (!(ui->resultat->text().contains('.')))
+    if (!(ui->resultat->text().endsWith('.')))
         ui->resultat->setText(ui->resultat->text() + '.');
 }
 
@@ -61,26 +73,24 @@ void MainWindow::math_operations()
 {
     QPushButton *button =  (QPushButton *) sender();
 
-    button->setChecked(true);
-//    double all_numbers;
+//    button->setChecked(true);
     QString new_label;
-    if (button-> text() == '+') {
-        new_label = (ui->resultat->text() + button->text());
-        ui->resultat->setText(new_label);
-    }
-    if (button-> text() == '-') {
-        new_label = (ui->resultat->text() + button->text());
-        ui->resultat->setText(new_label);
-    }
-    if (button-> text() == '*') {
-        new_label = (ui->resultat->text() + button->text());
-        ui->resultat->setText(new_label);
-    }
-    if (button-> text() == '/') {
-        new_label = (ui->resultat->text() + button->text());
-        ui->resultat->setText(new_label);
-    }
+    new_label = (ui->resultat->text() + button->text());
+    ui->resultat->setText(new_label);
 }
+
+
+void MainWindow::trigon()
+{
+    QPushButton *button =  (QPushButton *) sender();
+
+    QString new_label;
+    new_label = (ui->resultat->text() + button->text());
+    ui->resultat->setText(new_label);
+
+}
+
+
 
 
 //void MainWindow::on_pushButton_plus_clicked()
@@ -133,6 +143,32 @@ void MainWindow::on_pushButton_AC_clicked()
 }
 
 
+
+void MainWindow::on_y_equal_clicked()
+{
+////    QPushButton *button = (QPushButton *)sender();
+////    QString currentText = ui->resultat->text();
+
+////    ui->resultat->setText(currentText + 'y');
+    QPushButton *button = (QPushButton *)sender();
+    button->setChecked(true);
+    QString new_label;
+    new_label = (ui->resultat->text() + 'y');
+
+    QString currentText = ui->peremen_y->text();
+
+    y_value = currentText.toDouble(); // Преобразование строки в double
+
+    ui->resultat->setText(new_label);
+
+//    y_equal_clicked = true; // Установка флага в true после первого нажатия
+}
+
+
+
+
+
+
 void MainWindow::on_pushButton_equals_clicked()
 {
     t_stack* postfix = NULL;
@@ -140,16 +176,14 @@ void MainWindow::on_pushButton_equals_clicked()
     QString infix = ui->resultat->text();
     QByteArray infixBytes = infix.toLatin1();
     char* infixChar = infixBytes.data();
-    if (!valide_str(infixChar)) {
-        ui->resultat->setText("ERROR");
-    }
-    if (y_equal_clicked) {
-         y = y_value;
-    }
-//    printf("%s\n", infixChar);
-    infixToPostfix(infixChar, y, &postfix);
-    QString myString = QString::number(evaluatePostfix(&postfix, y));
-    ui->resultat->setText(myString);
+//    if (!valide_str(infixChar)) {
+//        ui->resultat->setText("ERROR");
+//    } else {
+        y = y_value;
+        infixToPostfix(infixChar, y, &postfix);
+        QString myString = QString::number(evaluatePostfix(&postfix, y));
+        ui->resultat->setText(myString);
+//    }
 }
 
 
@@ -167,19 +201,5 @@ void MainWindow::on_pushButton_equals_clicked()
 //}
 
 
-void MainWindow::on_y_equal_clicked()
-{
-//    QPushButton *button = (QPushButton *)sender();
-//    QString currentText = ui->resultat->text();
 
-//    ui->resultat->setText(currentText + 'y');
-            QPushButton *button = (QPushButton *)sender();
-            QString currentText = ui->peremen_y->text();
-
-            y_value = currentText.toDouble(); // Преобразование строки в double
-
-            ui->resultat->setText(currentText + 'y');
-
-            y_equal_clicked = true; // Установка флага в true после первого нажатия
-}
 
