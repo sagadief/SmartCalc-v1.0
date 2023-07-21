@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    customPlot = new QCustomPlot();
+
     connect(ui->pushButton_0, SIGNAL(clicked()), this, SLOT(digit_numbers()));
     connect(ui->pushButton_1, SIGNAL(clicked()), this, SLOT(digit_numbers()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(digit_numbers()));
@@ -85,7 +87,7 @@ void MainWindow::trigon()
     QPushButton *button =  (QPushButton *) sender();
 
     QString new_label;
-    new_label = (ui->resultat->text() + button->text());
+    new_label = (ui->resultat->text() + button->text() + '(');
     ui->resultat->setText(new_label);
 
 }
@@ -168,7 +170,6 @@ void MainWindow::on_y_equal_clicked()
 
 
 
-
 void MainWindow::on_pushButton_equals_clicked()
 {
     t_stack* postfix = NULL;
@@ -176,30 +177,50 @@ void MainWindow::on_pushButton_equals_clicked()
     QString infix = ui->resultat->text();
     QByteArray infixBytes = infix.toLatin1();
     char* infixChar = infixBytes.data();
-//    if (!valide_str(infixChar)) {
-//        ui->resultat->setText("ERROR");
-//    } else {
+    if (!(valide_str(infixChar))) {
+        ui->resultat->setText("ERROR");
+    } else {
         y = y_value;
         infixToPostfix(infixChar, y, &postfix);
         QString myString = QString::number(evaluatePostfix(&postfix, y));
         ui->resultat->setText(myString);
-//    }
+
+
+//        QVector<double> x(101), y(101); // initialize with entries 0..100
+//        for (int i=0; i<101; ++i)
+//        {
+//          x[i] = i/50.0 - 1; // x goes from -1 to 1
+//          y[i] = evaluatePostfix(&postfix, x[i]);
+////          y[i] = x[i]*x[i]; // let's plot a quadratic function
+//        }
+//        // create graph and assign data to it:
+//        customPlot->addGraph();
+//        customPlot->graph(0)->setData(x, y);
+//        // give the axes some labels:
+//        customPlot->xAxis->setLabel("x");
+//        customPlot->yAxis->setLabel("y");
+//        // set axes ranges, so we see all data:
+//        customPlot->xAxis->setRange(-1, 1);
+//        customPlot->yAxis->setRange(0, 1);
+//        customPlot->replot();
+
+
+
+    }
 }
 
 
 
 
-//void MainWindow::on_pushButton_minus_clicked()
-//{
-////    ui->textEdit->setText("Hello everybody");
-//}
-
-
-//void MainWindow::on_pushButton_clicked()
-//{
-//    ui->textEdit->setText("Hello everybody");
-//}
 
 
 
+
+
+
+
+void MainWindow::on_pushButton_degree_clicked()
+{
+    ui->resultat->setText(ui->resultat->text() + "^(");
+}
 

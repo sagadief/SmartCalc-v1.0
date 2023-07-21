@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTextStream>
+#include "qcustomplot.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,6 +22,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QCustomPlot *customPlot;
 
 private:
     bool y_equal_clicked;
@@ -37,6 +39,8 @@ private slots:
     void on_y_equal_clicked();
 
     void trigon();
+    void on_pushButton_degree_clicked();
+
 };
 
 

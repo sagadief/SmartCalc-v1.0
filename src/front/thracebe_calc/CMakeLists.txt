@@ -11,16 +11,20 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+#find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+#find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
 
 set(PROJECT_SOURCES
+        mainwindow.h
+        head.h
         main.cpp
         mainwindow.cpp
-        head.h
-        mainwindow.h
-        mainwindow.ui
         backend.c
+        mainwindow.ui
+        qcustomplot.cpp
+        qcustomplot.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -48,6 +52,7 @@ else()
 endif()
 
 target_link_libraries(thracebe_calc PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(thracebe_calc PRIVATE Qt6::PrintSupport)
 
 set_target_properties(thracebe_calc PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

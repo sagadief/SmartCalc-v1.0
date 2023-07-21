@@ -249,25 +249,61 @@ void double_to_str(double x, t_stack **head) {
 
 
 
-bool valide_str(char*infix) {
+// bool valide_str(char*infix) {
+//     bool flag = true, one_digit = false;
+//     int i = 0, brack = 0;
+
+//     while(infix[i] != '\0') {
+//         if (infix[i] == '(')
+//             brack++;
+//         if (infix[i] == ')')
+//             brack--;
+//         if (isdigit(infix[i]) || infix[i] == 'y')
+//             one_digit = true;
+//     }
+//     if (brack)
+//         flag = false;
+//     if (one_digit)
+//         flag = false;
+
+//     return flag;
+// }
+bool valide_str(char* infix) {
     bool flag = true, one_digit = false;
     int i = 0, brack = 0;
-
-    while(infix[i] != '\0') {
+    if (infix[0] == '*' || infix[0] == '/' || infix[0] == '^')
+        flag = false;
+    while (infix[i] != '\0') {
         if (infix[i] == '(')
             brack++;
-        if (infix[i] == ')')
+        else if (infix[i] == ')')
             brack--;
         if (isdigit(infix[i]) || infix[i] == 'y')
-            one_digit = true;
+            one_digit = true;            
+        // else if (!(isdigit(infix[i]) || infix[i] == 'y')) {
+        //     if (!isdigit(infix[i+1])) {
+        //         const char *str = "";
+        //         if (isdigit(infix[i+1] == )
+        //     }
+        // }
+            // one_digit = true;
+
+        i++; // Увеличиваем i для перехода к следующему символу
     }
-    if (brack)
+
+    if (brack != 0)
         flag = false;
-    if (one_digit)
+    if (!one_digit)
         flag = false;
 
     return flag;
 }
+
+
+
+
+
+
 
 
 // Преобразование инфиксной нотации в обратную польскую
@@ -325,7 +361,6 @@ void infixToPostfix(char* infix, double y, t_stack** numbers) {
                 sub_str[count] = '\0';
                 strncpy(sub_str, infix + i + 1, count);
                 t_stack* in_brackets = NULL;
-                // print_all_stack(operators);
                 infixToPostfix(sub_str, y, &in_brackets);
                 double num = evaluatePostfix(&in_brackets, y);
                 i = i + count;
@@ -364,19 +399,23 @@ double evaluatePostfix(t_stack** postfix, double y) {
     while (!is_empty(*postfix)) {
             char* str = get_top_elem(*postfix);  // Получаем строку из стека
             char* endPtr;
-            if (strcmp(str, "y") == 0) {
-                t_stack* tmp = pop(postfix);
-                push_back(&head, create_stack_elem(tmp->value));
-                free(tmp);
-            }
-            strtod(str, &endPtr);
-            if (!(endPtr == str)) {
+            // if (strcmp(str, "y") == 0) {
+            //     t_stack* tmp = pop(postfix);
+            //     // printf("$$$$$$$$$$$$$$$$%s\n", tmp->value);
+            //     push_back(&head, create_stack_elem(tmp->value));
+            //     free(tmp);
+            // }
+            // print_all_stack(head);
+            double gg = 0;
+            gg = strtod(str, &endPtr);
+            if (!(gg == 0 && endPtr == str) || (strcmp(str, "y") == 0)) {            // проверка на число
+            // printf("!!!!!!!!!!!!%s\n", str);
             t_stack* tmp = pop(postfix);
-            printf("!!!!!!!!!%s\n", tmp->value);
+            // printf("$$$$$$$$$$$$$$$$%s\n", tmp->value);
             push_back(&head, create_stack_elem(tmp->value));
             free(tmp);
         } else if (check_trigon(str)) {
-            t_stack* inter = pop(&head);
+            t_stack* inter = pop_back(&head);
             t_stack* tmp = pop(postfix);
             char* d = tmp->value;
             free(tmp);
@@ -494,43 +533,45 @@ double evaluatePostfix(t_stack** postfix, double y) {
 // 5 10 - -
 
 // Функция для тестирования
-int main() {
-  // char *infix = {"5+)\0"};
-  double y = 21.00;
-  char *infix = NULL;
-  t_stack* postfix = NULL;
-  int len = 0;
-  int bufsize = 0;
-  char c;
-  printf("Введите строку: ");
-  while ((c = getchar()) != '\n') {
-          if (len >= bufsize - 1) {
-              bufsize += 32;
-              infix = (char*)realloc(infix, bufsize);
-              if (!infix) {
-                  printf("Ошибка: не удалось выделить память\n");
-                  exit(1);
-              }
-          }
-          infix[len++] = c;
-      }
+// int main() {
+//   // char *infix = {"5+)\0"};
+//   double y = 21.00;
+//   char *infix = NULL;
+//   t_stack* postfix = NULL;
+//   int len = 0;
+//   int bufsize = 0;
+//   char c;
+//   printf("Введите строку: ");
+//   while ((c = getchar()) != '\n') {
+//           if (len >= bufsize - 1) {
+//               bufsize += 32;
+//               infix = (char*)realloc(infix, bufsize);
+//               if (!infix) {
+//                   printf("Ошибка: не удалось выделить память\n");
+//                   exit(1);
+//               }
+//           }
+//           infix[len++] = c;
+//       }
 
-  infix[len] = '\0';
+//   infix[len] = '\0';
 
+//     if (valide_str(infix)) {
+//     infixToPostfix(infix, y,&postfix);
+//     print_all_stack(postfix);
+//     printf("%0.10f\n", evaluatePostfix(&postfix, y));
+// //    printf("Выражение в обратной польской нотации: \n");
+// //    while (!is_empty(postfix)) {
+// //        t_stack* tmp = pop(&postfix);
+// //        printf("%s", tmp->value);
+// //        free(tmp);
+// //    }
+// //    printf("\n");
 
-  infixToPostfix(infix, y,&postfix);
-  print_all_stack(postfix);
-  printf("%0.10f\n", evaluatePostfix(&postfix, y));
-//    printf("Выражение в обратной польской нотации: \n");
-//    while (!is_empty(postfix)) {
-//        t_stack* tmp = pop(&postfix);
-//        printf("%s", tmp->value);
-//        free(tmp);
-//    }
-//    printf("\n");
-
-  free(infix);
-  free(postfix);
-
-  return 0;
-}
+//     free(infix);
+//     free(postfix);
+//     } else {
+//         printf("ERROR\n");
+//     }
+//   return 0;
+// }
