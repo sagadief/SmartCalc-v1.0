@@ -2,6 +2,7 @@
 #include "head.h"
 #include "./ui_mainwindow.h"
 #include "backend.c"
+#include "qcustomplot.h"
 #include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -74,8 +75,6 @@ void MainWindow::on_pushButton_dot_clicked()
 void MainWindow::math_operations()
 {
     QPushButton *button =  (QPushButton *) sender();
-
-//    button->setChecked(true);
     QString new_label;
     new_label = (ui->resultat->text() + button->text());
     ui->resultat->setText(new_label);
@@ -92,17 +91,6 @@ void MainWindow::trigon()
 
 }
 
-
-
-
-//void MainWindow::on_pushButton_plus_clicked()
-//{
-////    QPushButton *button =  (QPushButton *) sender();
-////    ui->resultat->text() + button->text();
-////    ui->resultat->setText(new_label);
-//    ui->resultat->setText("Hello everybody");
-//}
-
 void MainWindow::brackets()
 {
     QPushButton *button = (QPushButton *)sender();
@@ -110,14 +98,6 @@ void MainWindow::brackets()
 
     QString currentText = ui->resultat->text();
 
-//    int openBracketCount = currentText.count('(');
-//    int closeBracketCount = currentText.count(')');
-
-//    if (openBracketCount > closeBracketCount) {
-//        ui->resultat->setText(currentText + ')');
-//    } else {
-//        ui->resultat->setText(currentText + '(');
-//    }
     if (button-> text() == '(') {
         ui->resultat->setText(currentText + '(');
     }
@@ -134,11 +114,6 @@ void MainWindow::on_pushButton_del_clicked()
       ui->resultat->setText(current_text);
 }
 
-
-
-
-
-
 void MainWindow::on_pushButton_AC_clicked()
 {
     ui->resultat->clear();
@@ -148,79 +123,94 @@ void MainWindow::on_pushButton_AC_clicked()
 
 void MainWindow::on_y_equal_clicked()
 {
-////    QPushButton *button = (QPushButton *)sender();
-////    QString currentText = ui->resultat->text();
-
-////    ui->resultat->setText(currentText + 'y');
     QPushButton *button = (QPushButton *)sender();
     button->setChecked(true);
     QString new_label;
-    new_label = (ui->resultat->text() + 'y');
+    new_label = (ui->resultat->text() + 'x');
 
     QString currentText = ui->peremen_y->text();
 
-    y_value = currentText.toDouble(); // Преобразование строки в double
+    x_value = currentText.toDouble();
 
     ui->resultat->setText(new_label);
-
-//    y_equal_clicked = true; // Установка флага в true после первого нажатия
 }
-
-
 
 
 
 void MainWindow::on_pushButton_equals_clicked()
 {
     t_stack* postfix = NULL;
-    double y = 0;
+    double x = 0;
     QString infix = ui->resultat->text();
     QByteArray infixBytes = infix.toLatin1();
     char* infixChar = infixBytes.data();
     if (!(valide_str(infixChar))) {
         ui->resultat->setText("ERROR");
     } else {
-        y = y_value;
-        infixToPostfix(infixChar, y, &postfix);
-        QString myString = QString::number(evaluatePostfix(&postfix, y));
-        ui->resultat->setText(myString);
-
-
-//        QVector<double> x(101), y(101); // initialize with entries 0..100
-//        for (int i=0; i<101; ++i)
-//        {
-//          x[i] = i/50.0 - 1; // x goes from -1 to 1
-//          y[i] = evaluatePostfix(&postfix, x[i]);
-////          y[i] = x[i]*x[i]; // let's plot a quadratic function
-//        }
-//        // create graph and assign data to it:
-//        customPlot->addGraph();
-//        customPlot->graph(0)->setData(x, y);
-//        // give the axes some labels:
-//        customPlot->xAxis->setLabel("x");
-//        customPlot->yAxis->setLabel("y");
-//        // set axes ranges, so we see all data:
-//        customPlot->xAxis->setRange(-1, 1);
-//        customPlot->yAxis->setRange(0, 1);
-//        customPlot->replot();
-
-
-
+        x = x_value;
+        if (infixChar[0] == 'x' && infixChar[1] == '\0')
+            ui->resultat->setText("ERROR");
+        else {
+            infixToPostfix(infixChar, x, &postfix);
+            double result = evaluatePostfix(&postfix, x);
+            QString myString = QString::number(result);
+            ui->resultat->setText(myString);
+        }
     }
 }
 
 
+void MainWindow::on_pushButton_build_clicked()
+{
+    t_stack* postfix = NULL;
+    double x = 0;
+    QString infix = ui->resultat->text();
+    QByteArray infixBytes = infix.toLatin1();
+    char* infixChar = infixBytes.data();
+    if (!(valide_str(infixChar))) {
+            ui->resultat->setText("ERROR");
+        } else {
+        x = x_value;
+        infixToPostfix(infixChar, x, &postfix);
+        double result = evaluatePostfix(&postfix, x);
+        QString myString = QString::number(result);
+        QVector<double> xx,yy;
+        ui->customPlot->clearGraphs();
+        xx.clear();
+        yy.clear();
+        xBegin = ui->x_min->text().toDouble();
+        h = 0.1;
+        double res = 0;
+        xEnd = ui->x_max->text().toDouble() + h;
+        ui->customPlot->xAxis->setRange(ui->x_min->text().toDouble(),
+                                        ui->x_max->text().toDouble());
+        ui->customPlot->yAxis->setRange(ui->y_min->text().toDouble(),
+                                        ui->y_max->text().toDouble());
+        X = xBegin;
+        N = (xEnd - xBegin) / h + 2;
+            for (X = xBegin; X <= xEnd; X += h) {
+            xx.push_back(X);
+            infixToPostfix(infixChar, X, &postfix);
+            result = evaluatePostfix(&postfix, X);
+            yy.push_back(result);
+        }
 
 
-
-
-
-
-
+            ui->customPlot->addGraph();
+            ui->customPlot->graph(0)->addData(xx, yy);
+            ui->customPlot->replot();
+    }
+}
 
 
 void MainWindow::on_pushButton_degree_clicked()
 {
     ui->resultat->setText(ui->resultat->text() + "^(");
+}
+
+
+void MainWindow::on_pushButton_credit_clicked()
+{
+    credit.show();
 }
 

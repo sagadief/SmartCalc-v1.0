@@ -25,6 +25,10 @@ set(PROJECT_SOURCES
         mainwindow.ui
         qcustomplot.cpp
         qcustomplot.h
+        credit.h
+        credit.cpp
+        credit.ui
+        credit.c
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

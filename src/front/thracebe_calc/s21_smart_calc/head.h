@@ -34,11 +34,11 @@ t_stack* pop(t_stack** head);
 bool is_unary_operator(const char* op);
 char* get_last_elem(t_stack* head);
 t_stack* pop_back(t_stack** head);
-int get_number(char * infix, int pos, t_stack **head, double y);
+int get_number(char * infix, int pos, t_stack **head);
 void double_to_str(double x, t_stack **head);
 void double_to_str_trig(double x, t_stack **head);
-void infixToPostfix(char* infix,  double y, t_stack** numbers);
-double evaluatePostfix(t_stack** postfix,  double y);
+void infixToPostfix(char* infix,  double x, t_stack** numbers);
+double evaluatePostfix(t_stack** postfix,  double x);
 bool valide_str(char*infix);
 
 
